@@ -1,7 +1,7 @@
 <template>
   <div class="logo">
     <img src="~@/assets/logo.png" alt="">
-    <h2 v-show="!collapsed" class="title">Vue3-admin</h2>
+    <h2 v-show="!collapsed" class="title">管理平台</h2>
   </div>
 </template>
 

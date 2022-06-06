@@ -7,7 +7,7 @@
         <div class="login-container-form">
           <header>
             <img src="@/assets/images/logo.png" />
-            <h1>vue3-admin</h1>
+            <h1>BT数据抓取管理平台</h1>
           </header>
           <a-form :model="form" @submit="handleSubmit" @submit.prevent>
             <a-form-item>
@@ -31,7 +31,7 @@
             </a-form-item>
             <a-form-item>
               <a-button type="primary" size="large" @click="handleSubmit" block>
-                Login in
+                登录
               </a-button>
             </a-form-item>
           </a-form>

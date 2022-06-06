@@ -7,25 +7,26 @@
 
 <script>
 import * as echarts from 'echarts'
-import { onMounted } from 'vue'
+import {onMounted, ref} from 'vue'
+import axios from "axios";
 export default {
   setup() {
-    const echartInit = () =>{
+    const echartInit = (a, b) =>{
       var myChart = echarts.init(document.getElementById("main"),'light')
 
       var option = {
          title: {
-          text: "pie饼图示例",
+          text: "抓取链接类型饼图",
         },
         tooltip: {
-          
+
         },
         legend: {
                  top: '5%',
         left: 'center'
         },
         xAxis: {
-          data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"],
+          data: ["BT/TCP", "UTP", "UDP"],
         },
         yAxis: {},
         grid:{
@@ -35,28 +36,30 @@ export default {
         },
         dataset:{
             source:[
-              ["衬衫",5,20,"王大合",30],
+              /*["衬衫",5,20,"王大合",30],
               ["羊毛衫",20,36,"王小河",30],
               ["雪纺衫",36,10,"王小军",40],
               ["裤子",10,5],
               ["高跟鞋",10,10],
-              ["袜子",20,30]
+              ["袜子",20,30]*/
+                ["BT/TCP",a],
+                ["uTP",b],
             ]
         },
         series: [
-      
+
            {
-            name: "市场",
+            name: "饼形占比",
             type: "pie",
             center:['25%','50%'],
             radius:[0,'30%'],
             encode:{itemName:0,value:1}
           },
 
-        
+
 
              {
-            name: '圆角矩形',
+            name: '圆角矩形占比',
             type: 'pie',
             radius: ['40%', '70%'],
             center:['75%','50%'],
@@ -108,9 +111,9 @@ export default {
 
             animationType: 'scale',
             animationEasing: 'elasticOut',
-           
+
         }
-          
+
         ],
       }
 
@@ -118,8 +121,14 @@ export default {
     }
 
     onMounted(()=>{
-      echartInit()
+      axios.post('http://localhost:9900/public/getprotocol').then(function (ret) {
+        console.log(ret)
+        echartInit(ret.data.data.bttcpc, ret.data.data.utpc);
+      });
+
     })
+
+
 
     return {
       echartInit

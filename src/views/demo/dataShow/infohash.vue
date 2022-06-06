@@ -1,10 +1,10 @@
 <template>
-$END$
+  <div>User {{ $route.params.infohash }}</div>
 </template>
 
 <script>
 export default {
-name: "infohash"
+  name: "infohash"
 }
 </script>
 

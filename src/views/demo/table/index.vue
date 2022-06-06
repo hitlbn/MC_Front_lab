@@ -1,218 +1,164 @@
-<template>
-  <a-table :data-source="data" :columns="columns" :pagination="pagination">
-    <!-- 点击下拉搜索 -->
-    <template #filterDropdown="{setSelectedKeys, selectedKeys, confirm, clearFilters, column}">
-       <div style="padding: 8px">
-        <a-input
-          ref="searchInput"
-          :placeholder="`Search ${column.dataIndex}`"
-          :value="selectedKeys[0]"
-          style="width: 188px; margin-bottom: 8px; display: block"
-          @change="e => setSelectedKeys(e.target.value ? [e.target.value] : [])"
-          @pressEnter="handleSearch(selectedKeys, confirm, column.dataIndex)"
-        />
-        <a-button
-          type="primary"
-          size="small"
-          style="width: 90px; margin-right: 8px"
-          @click="handleSearch(selectedKeys, confirm, column.dataIndex)"
-        >
-          <template #icon><SearchOutlined /></template>
-          Search
-        </a-button>
-        <a-button size="small" style="width: 90px" @click="handleReset(clearFilters)">
-          Reset
-        </a-button>
-      </div>
-    </template>
-    <!-- 标题列的icon图标 -->
-    <template #filterIcon="filtered">
-      <SearchOutlined :style="{ color: filtered ? '#108ee9' : undefined }"  />
-    </template>
-       <template #customRender="{ text, column }">
-      <span v-if="searchText && searchedColumn === column.dataIndex">
-        <template
-          v-for="(fragment, i) in text
-            .toString()
-            .split(new RegExp(`(?<=${searchText})|(?=${searchText})`, 'i'))"
-        >
-          <mark
-            v-if="fragment.toLowerCase() === searchText.toLowerCase()"
-            class="highlight"
-            :key="i"
-          >
-            {{ fragment }}
-          </mark>
-          <template v-else>{{ fragment }}</template>
-        </template>
-      </span>
-      <template v-else>
-        {{ text }}
+<template xmlns:text-algin="http://www.w3.org/1999/xhtml">
+  <div style="float: right;">
+  <a-button type="primary" size="large" @click="flush">刷新</a-button>
+  </div>
+  <br/>
+  <br/>
+  <a-collapse v-model:activeKey="activeKey">
+    <a-collapse-panel v-for="item in data" :key="item.record_id">
+      <template #header>
+        <a> {{ item.src_ip }}:{{ item.src_port }}</a>
+        <a-divider type="vertical"/>
+        <a> {{ item.dst_ip }}:{{ item.dst_port }}</a>
+        <a-divider type="vertical"/>
+        <a-radio-button @click="gotoDS(item.info_hash)">{{item.info_hash}}</a-radio-button>
       </template>
-    </template>
-  </a-table>
+      <div>
+      <a-descriptions title="详细数据" bordered :column="2">
+        <a-descriptions-item label="src应用">{{item.client_name1}}</a-descriptions-item>
+        <a-descriptions-item label="dst应用">{{item.client_name2}}</a-descriptions-item>
+        <a-descriptions-item label="src传输消息数量">{{item.message_count1}}</a-descriptions-item>
+        <a-descriptions-item label="dst传输消息数量">{{item.message_count2}}</a-descriptions-item>
+        <a-descriptions-item label="src传输数据量">{{item.transfer_bytes1}}</a-descriptions-item>
+        <a-descriptions-item label="dst传输数据量">{{item.transfer_bytes2}}</a-descriptions-item>
+        <a-descriptions-item label="最后活跃时间">{{item.last_act_time}}</a-descriptions-item>
+        <a-descriptions-item label="使用协议">{{item.protocol}}</a-descriptions-item>
+      </a-descriptions>
+      </div>
+      <br/>
+      <div>
+      <a-button danger @click="banlink(item.src_ip)">封禁源IP</a-button>
+        &nbsp&nbsp&nbsp&nbsp&nbsp
+        <a-button danger @click="banlink(item.dst_ip)">封禁目的IP</a-button>
+      </div>
+    </a-collapse-panel>
+    <br/>
+    <div style="width: 400px;margin: 0px auto;">
+      <a-button type="primary" size="large" @click="lastPage">上一页</a-button>
+      &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+      <a-divider type="vertical" />
+      <a> 第 {{pageNum}} 页 </a>
+      <a-divider type="vertical" />
+      &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+      <a-button type="primary" size="large" @click="nextPage">下一页</a-button>
+    </div>
+  </a-collapse>
+
+  <a-form class="">
+
+  </a-form>
 </template>
+
 <script>
-import { SearchOutlined } from '@ant-design/icons-vue';
-import {reactive,ref } from 'vue';
 
-const pagination = {
-  showQuickJumper: true,
-  pageSize: 5,
+import {defineComponent, ref, watch} from 'vue';
+import { message } from 'ant-design-vue';
+import axios from 'axios'
 
-  showTotal: (total) => `共 ${total} 条数据`,
-  showSizeChanger: true,
-  pageSizeOptions: ["10", "15", "30", "40", "50"],
-};
+export default defineComponent({
 
-const data = [
-  {
-    key: "1",
-    name: "王大合",
-    age: 32,
-    address: "西湖区湖底公园1号",
+  mounted() {
+    let that = this;
+    axios.post('http://localhost:9900/public/getData', JSON.stringify({
+      pageNum : that.pageNum
+    })).then(function (ret) {
+      that.data = ret.data.data;
+    });
   },
-  {
-    key: "2",
-    name: "王小河",
-    age: 42,
-    address: "西湖区湖底公园1号",
-  },
-  {
-    key: "3",
-    name: "王大合",
-    age: 32,
-    address: "西湖区湖底公园1号",
-  },
-  {
-    key: "4",
-    name: "王小河",
-    age: 42,
-    address: "西湖区湖底公园1号",
-  },
-  {
-    key: "5",
-    name: "王大军",
-    age: 32,
-    address: "西湖区湖底公园1号",
-  },
-  {
-    key: "6",
-    name: "王小河",
-    age: 42,
-    address: "西湖区湖底公园1号",
-  },
-  {
-    key: "7",
-    name: "王大合",
-    age: 32,
-    address: "西湖区湖底公园1号",
-  },
-  {
-    key: "8",
-    name: "王小河",
-    age: 42,
-    address: "西湖区湖底公园1号",
-  },
-  {
-    key: "9",
-    name: "王大合",
-    age: 32,
-    address: "西湖区湖底公园1号",
-  },
-  {
-    key: "10",
-    name: "王小河",
-    age: 42,
-    address: "西湖区湖底公园1号",
-  },
-  {
-    key: "11",
-    name: "王大合",
-    age: 32,
-    address: "西湖区湖底公园1号",
-  },
-  {
-    key: "12",
-    name: "王小明",
-    age: 42,
-    address: "西湖区湖底公园1号",
-  },
-];
 
-export default {
-   components: {
-      SearchOutlined
+  methods : {
+    flush () {
+      let that = this;
+      axios.post('http://localhost:9900/public/getData', JSON.stringify({
+        pageNum : that.pageNum
+      })).then(function (ret) {
+        message.success('Flush Data Success');
+        that.data = ret.data.data;
+      });
     },
 
+    lastPage () {
+      let that = this;
+      if(that.pageNum === 1) {
+        message.info('已经是第1页');
+      } else {
+        that.pageNum = that.pageNum - 1;
+        axios.post('http://localhost:9900/public/getData', JSON.stringify({
+          pageNum:that.pageNum
+        })).then(function (ret) {
+          that.data = ret.data.data;
+        });
+      }
+    },
+
+    nextPage () {
+      let that = this;
+      that.pageNum = that.pageNum + 1;
+      axios.post('http://localhost:9900/public/getData', JSON.stringify({
+        pageNum:that.pageNum
+      })).then(function (ret) {
+        that.data = ret.data.data;
+      });
+    },
+
+    gotoDS (info) {
+      this.$router.push("/dataShow/" + encodeURIComponent(info));
+    },
+
+    banlink (ip) {
+      axios.post('http://localhost:9900/public/banlink', JSON.stringify({
+        ip : ip,
+      })).then(function (ret) {
+      });
+      message.success('ban success');
+    }
+  },
+
+
   setup() {
-      const state = reactive({
-      searchText: '',
-      searchedColumn: '',
+    const text = `A dog is a type of domesticated animal.Known for its loyalty and faithfulness,it can be found as a welcome guest in many households across the world.`;
+    const activeKey = ref(['1']);
+
+    const pageNum = 1;
+
+    watch(activeKey, val => {
+      console.log(val);
     });
 
-    const searchInput = ref();
-   
-    const columns = [
+    const totalNum = ref([
       {
-        title: "姓名",
-        dataIndex: "name",
-        key: "name",
-         slots: {
-          filterDropdown: 'filterDropdown',
-          filterIcon: 'filterIcon',
-          customRender: 'customRender',
-        },
-         onFilter: (value, record) =>
-          record.name.toString().toLowerCase().includes(value.toLowerCase()),
-        onFilterDropdownVisibleChange: visible => {
-          if (visible) {
-            setTimeout(() => {
-              console.log(searchInput.value);
-              searchInput.value.focus();
-            }, 0);
-          }
-        },
-      },
-      {
-        title: "年龄",
-        dataIndex: "age",
-        key: "age",
-      },
-      {
-        title: "住址",
-        dataIndex: "address",
-        key: "address",
-      },
-    ];
+        "totalNum" : 15
+      }
+    ])
 
-    const handleSearch = (selectedKeys, confirm, dataIndex) => {
-      confirm();
-      state.searchText = selectedKeys[0];
-      state.searchedColumn = dataIndex;
-    };
+    const data = ref([
+      {
+        "record_id": 8,
+        "src_ip": "192.168.122.41",
+        "dst_ip": "101.83.46.243",
+        "src_port": 62561,
+        "dst_port": 12345,
+        "info_hash": "kvNwMoKRdxr/zj2uzDcxp4Rp+fc=",
+        "client_name1": "qBittorrent/4.2.5",
+        "client_name2": "Transmission 3.00",
+        "message_count1": 84,
+        "message_count2": 12,
+        "transfer_bytes1": 0,
+        "transfer_bytes2": 0,
+        "last_act_time": "2022-04-27T01:22:28.77",
+        "protocol": "uTP"
+      }
+    ]);
 
-    const handleReset = clearFilters => {
-      clearFilters();
-      state.searchText = '';
-    };
+
     return {
+      text,
+      activeKey,
       data,
-      columns,
-      pagination,
-      searchText:'',
-      searchedColumn:'',
-      searchInput,
-      handleSearch,
-      handleReset
+      pageNum,
+      totalNum,
     };
-    
   },
-};
+});
+
 </script>
-<style scoped>
-.highlight {
-  background-color: rgb(255, 192, 105);
-  padding: 0px;
-}
-</style>

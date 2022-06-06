@@ -52,6 +52,24 @@ export const constantRoutes = [
           icon: 'remixicon-line',
         },
       },
+      {
+        path: '/dataShow/:infohash',
+        name: 'DataShow',
+        component: () => import('@/views/demo/dataShow/index.vue'),
+        meta: {
+          title: '表格',
+          icon: 'table-2',
+        },
+      },
+      {
+        path: '/banlistShow',
+        name: 'banlistShow',
+        component: () => import('@/views/demo/banlistShow/index.vue'),
+        meta: {
+          title: '表格',
+          icon: 'warning',
+        },
+      },
     ],
   },
 
@@ -63,6 +81,11 @@ export const constantRoutes = [
     component: () => import('@/views/login/Login.vue'),
     hidden: true,
   },
+  {
+    path: '/file/:infohash',
+    name: 'infohash',
+    component: () => import('@/views/demo/dataShow/infohash.vue'),
+  }
   // {
   //   path: '/403',
   //   name: '403',
@@ -121,26 +144,6 @@ export const asyncRoutes = [
       roles: ['admin','editor']
     },
     children: [
-      {
-        path: 'bar',
-        name: 'Bar',
-        component: () => import('@/views/echart/bar/index.vue'),
-        meta: {
-          title: '路由测试1',
-          icon: 'test-tube-line',
-          roles: ['admin','editor']
-        },
-      },
-      {
-        path: 'line',
-        name: 'Line',
-        component: () => import('@/views/echart/line/index.vue'),
-        meta: {
-          title: '路由测试2',
-          icon: 'test-tube-line',
-          roles: ['admin','editor']
-        },
-      },
       {
         path: 'pie',
         name: 'Pie',

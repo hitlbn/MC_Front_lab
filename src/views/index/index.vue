@@ -1,61 +1,98 @@
 <!--  -->
 <template>
   <div>
-    
-    <a-card title="vue3-admin系统更新信息" class="version-info">
-       
-      <a-list
-        :grid="{ gutter: 16, xs: 1, sm: 2, md: 4, lg: 4, xl: 6, xxl: 3 }"
-        :data-source="data"
-      >
-        <template #renderItem="{ item }">
-          <a-list-item>
-            <a-card :title="item.title">{{item.content}}</a-card>
-          </a-list-item>
-        </template>
-      </a-list>
+    <a-card title="BT数据抓取管控信息" class="version-info">
+
+      <div style="background-color: #ececec; padding: 20px" v-for="item in data">
+        <a-row :gutter="16">
+          <a-col :span="8">
+            <a-card title="链接总数" :bordered="false">
+              <p>{{item.linknum}}</p>
+            </a-card>
+          </a-col>
+          <a-col :span="8">
+            <a-card title="封禁IP数" :bordered="false">
+              <p>{{item.banipnum}}</p>
+            </a-card>
+          </a-col>
+          <a-col :span="8">
+            <a-card title="链接最后活跃时间" :bordered="false">
+              <p>{{item.lastactime}}</p>
+            </a-card>
+          </a-col>
+        </a-row>
+      </div>
+      <div style="background-color: #ececec; padding: 20px" v-for="item in data">
+        <a-row :gutter="16">
+          <a-col :span="8">
+            <a-card title="消息总数" :bordered="false">
+              <p>{{item.messagenum}}</p>
+            </a-card>
+          </a-col>
+          <a-col :span="8">
+            <a-card title="BT传输总量" :bordered="false">
+              <p>{{item.btmem}}</p>
+            </a-card>
+          </a-col>
+          <a-col :span="8">
+            <a-card title="传输文件总数" :bordered="false">
+              <p>{{item.docnum}}</p>
+            </a-card>
+          </a-col>
+        </a-row>
+      </div>
     </a-card>
+    <br/>
+    <br/>
+    <div style="float: right;">
+      <a-button type="primary" size="large" @click="flush">刷新</a-button>
+    </div>
   </div>
 </template>
 
 <script>
-const data = [
-  {
-    title: 'Vue',
-    content:'3.0.0'
-  },
-  {
-    title: 'vue-router',
-     content:'4.0.1'
-  },
-   {
-    title: '@vue/cli',
-     content:'4.5.0'
-  },
-  {
-    title: 'vuex',
-     content:'4.0.0-rc.2'
-  },
-  {
-    title: 'ant-design-vue',
-     content:'2.0.0-rc.3'
-  },
-  {
-    title: 'axios',
-     content:'0.21.1'
-  },
-  
-];
+import axios from "axios";
+import {defineComponent, ref, watch} from "vue";
+import {message} from "ant-design-vue";
 
- 
-export default {
+export default defineComponent({
+
+  mounted() {
+    let that = this;
+    axios.post('http://localhost:9900/public/getMessage').then(function (ret) {
+      that.data = ret.data.data;
+    });
+  },
+
+  methods : {
+    flush() {
+      let that = this;
+      axios.post('http://localhost:9900/public/getMessage').then(function (ret) {
+        that.data = ret.data.data;
+        message.success('Flush Data Success');
+      });
+    },
+  },
+
   setup() {
-     return {
+
+    const data = ref([
+      {
+        "linknum" : 1,
+        "banipnum" : 1,
+        "lastactime" : "2022-04-27T01:22:28.77",
+        "messagenum" : 1,
+        "btmem" : 1,
+        "docnum" : 1,
+      }
+    ]);
+
+    return {
       data,
-     
+
     };
   }
-};
+});
 </script>
 <style lang="less" scoped>
 .version-info {

@@ -18,16 +18,6 @@
       <a-layout-header class="app-header">
         <a-row>
           <a-col>
-            <menu-unfold-outlined
-              v-if="collapsed"
-              class="trigger"
-              @click="() => (collapsed = !collapsed)"
-            />
-            <menu-fold-outlined
-              v-else
-              class="trigger"
-              @click="() => (collapsed = !collapsed)"
-            />
           </a-col>
           <a-col>
             <!-- header右侧头像信息 -->

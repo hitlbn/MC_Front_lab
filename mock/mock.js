@@ -69,27 +69,34 @@ Mock.mock(
           {
             name:'demo',
             meta:{
-              icon:'icon-wallet1',
-              title:'demo'
+              icon:'icon-hardware',
+              title:'数据管理'
             },
             children: [
               {
                 name:'Table',
                 meta: {
-                  title: '表格',
+                  title: '抓取数据',
                   icon: 'icon-form-fill',
                 },
               },
               {
-                name:'Icon',
+                name:'banlistShow',
                 meta: {
-                  title: '图标',
-                  icon: 'icon-shuffling-banner-fill',
+                  title: '封禁列表',
+                  icon: 'icon-form-fill',
+                },
+              },
+              {
+                name:'Pie',
+                meta: {
+                  title: '协议饼图',
+                  icon: 'icon-help1',
                 },
               },
             ],
           },
-          {
+          /*{
             name:'echart',
             meta:{
               icon:'icon-inspection-fill',
@@ -100,13 +107,6 @@ Mock.mock(
                 name:'Bar',
                 meta: {
                   title: 'bar',
-                  icon: 'icon-help1',
-                },
-              },
-              {
-                name:'Line',
-                meta: {
-                  title: 'line',
                   icon: 'icon-help1',
                 },
               },
@@ -141,11 +141,11 @@ Mock.mock(
                   icon: 'icon-help1',
                 },
               },
-             
+
             ]
-          },
-          
-          {
+          },*/
+
+          /*{
             name:'system',
             meta:{
               icon:'icon-set1',
@@ -166,9 +166,9 @@ Mock.mock(
                   icon: 'icon-order-fill',
                 },
               },
-             
+
             ]
-          },
+          },*/
         ] 
         
       }
